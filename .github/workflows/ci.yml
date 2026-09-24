@@ -1,0 +1,100 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+
+env:
+  VCPKG_COMMIT: a1cae005c39be7b18ba319fced856b68d7276271
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    services:
+      mongo:
+        image: mongo:8.0.30-noble
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1}).ok'"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Install pinned vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "$RUNNER_TEMP/vcpkg"
+          git -C "$RUNNER_TEMP/vcpkg" checkout --detach "$VCPKG_COMMIT"
+          "$RUNNER_TEMP/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
+          echo "VCPKG_ROOT=$RUNNER_TEMP/vcpkg" >> "$GITHUB_ENV"
+      - name: Work around GitHub archive endpoint timeouts
+        run: |
+          mkdir -p "$VCPKG_ROOT/downloads"
+          curl --fail --location --retry 5 --show-error \
+            https://codeload.github.com/drogonframework/drogon/tar.gz/refs/tags/v1.9.13 \
+            --output "$VCPKG_ROOT/downloads/drogonframework-drogon-v1.9.13.tar.gz"
+      - run: cmake --preset linux-debug
+      - run: cmake --build --preset linux-debug --parallel 2
+      - run: XDG_RUNTIME_DIR=/tmp ctest --preset linux-debug -LE integration
+      - name: MongoDB integration tests
+        run: TIKTOK_TEST_MONGODB_URI=mongodb://127.0.0.1:27017 ./out/build/linux-debug/tiktok_mongo_integration_tests
+      - name: Start backend and test HTTP/browser journeys
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017
+          MONGODB_DATABASE: tiktok_clone_ci_test
+          MEDIA_ROOT: ${{ runner.temp }}/tiktok-media
+          FRONTEND_ORIGIN: http://localhost:3000
+          ENABLE_TEST_AUTH: "true"
+          TEST_AUTH_KEY: ci-only-test-key-123456789012345
+          ADMIN_USER_IDS: test:api-alice
+        run: |
+          mkdir -p "$MEDIA_ROOT"
+          ./out/build/linux-debug/tiktok_backend > "$RUNNER_TEMP/backend.log" 2>&1 &
+          curl --retry 30 --retry-connrefused --retry-delay 1 --fail http://127.0.0.1:8080/api/health
+          API_BASE_URL=http://127.0.0.1:8080 npm run test:api
+          npx playwright install --with-deps chromium
+          TEST_AUTH_KEY="$TEST_AUTH_KEY" npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-test-artifacts
+          path: |
+            test-results
+            playwright-report
+            ${{ runner.temp }}/backend.log
+
+  windows-msvc:
+    # Keep CI aligned with the documented/groupmate Visual Studio 2022 setup.
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Install pinned vcpkg
+        shell: pwsh
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "$env:RUNNER_TEMP\vcpkg"
+          git -C "$env:RUNNER_TEMP\vcpkg" checkout --detach "$env:VCPKG_COMMIT"
+          & "$env:RUNNER_TEMP\vcpkg\bootstrap-vcpkg.bat" -disableMetrics
+          "VCPKG_ROOT=$env:RUNNER_TEMP\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Cache Drogon source archive
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$env:VCPKG_ROOT\downloads" | Out-Null
+          Invoke-WebRequest -Uri "https://codeload.github.com/drogonframework/drogon/tar.gz/refs/tags/v1.9.13" -OutFile "$env:VCPKG_ROOT\downloads\drogonframework-drogon-v1.9.13.tar.gz"
+      - run: cmake --preset windows-debug
+      - run: cmake --build --preset windows-debug --parallel 2
+      - run: ctest --preset windows-debug -LE integration

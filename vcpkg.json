@@ -1,0 +1,38 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "tiktok-clone-cpp-backend",
+  "version-semver": "2.0.0",
+  "builtin-baseline": "a1cae005c39be7b18ba319fced856b68d7276271",
+  "dependencies": [
+    "catch2",
+    "drogon",
+    {
+      "name": "jwt-cpp",
+      "features": [
+        "picojson"
+      ]
+    },
+    "mongo-cxx-driver",
+    "openssl"
+  ],
+  "overrides": [
+    {
+      "name": "catch2",
+      "version": "3.16.0"
+    },
+    {
+      "name": "drogon",
+      "version": "1.9.13",
+      "port-version": 2
+    },
+    {
+      "name": "jwt-cpp",
+      "version": "0.7.2"
+    },
+    {
+      "name": "mongo-cxx-driver",
+      "version": "4.4.0"
+    }
+  ]
+}
+

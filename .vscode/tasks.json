@@ -1,0 +1,74 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Frontend: install",
+      "type": "shell",
+      "command": "npm ci",
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: dev server",
+      "type": "shell",
+      "command": "npm run dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^(.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Local:",
+          "endsPattern": "http://localhost:3000"
+        }
+      }
+    },
+    {
+      "label": "Frontend: check",
+      "type": "shell",
+      "command": "npm run lint && npm test && npm run build",
+      "windows": { "command": "npm run lint; if ($LASTEXITCODE -eq 0) { npm test }; if ($LASTEXITCODE -eq 0) { npm run build }" },
+      "problemMatcher": []
+    },
+    {
+      "label": "C++: configure",
+      "type": "shell",
+      "command": "cmake --preset ${input:cmakePreset}",
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "C++: build",
+      "type": "shell",
+      "command": "cmake --build --preset ${input:cmakePreset}",
+      "dependsOn": "C++: configure",
+      "problemMatcher": ["$gcc", "$msCompile"]
+    },
+    {
+      "label": "C++: test",
+      "type": "shell",
+      "command": "ctest --preset ${input:cmakePreset} -LE integration",
+      "dependsOn": "C++: build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: start application",
+      "type": "shell",
+      "command": "docker compose up -d --build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: stop application",
+      "type": "shell",
+      "command": "docker compose down",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "cmakePreset",
+      "type": "pickString",
+      "description": "Choose your operating system build preset",
+      "options": ["linux-debug", "linux-release", "windows-debug", "windows-release"],
+      "default": "linux-debug"
+    }
+  ]
+}

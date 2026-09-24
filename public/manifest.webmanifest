@@ -1,0 +1,12 @@
+{
+  "name": "TikTik School Project",
+  "short_name": "TikTik",
+  "description": "A social video application powered by C++ and MongoDB.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090f",
+  "theme_color": "#f51967",
+  "icons": [
+    { "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

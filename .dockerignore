@@ -1,0 +1,17 @@
+.git
+.github
+.next
+dist
+node_modules
+out
+vcpkg_installed
+data
+uploads
+.env
+.env.*
+!.env.example
+coverage
+playwright-report
+test-results
+.deps
+npm-debug.log*
