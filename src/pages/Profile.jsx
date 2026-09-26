@@ -77,7 +77,7 @@ const Profile = () => {
     setReportStatus('')
     try {
       await api.reportUser(id, reportReason, reportDetails.trim(), csrfToken)
-      setReportStatus('Report submitted. Thank you for helping keep TikTik safe.')
+      setReportStatus('Report submitted. Thank you for helping keep RippleNest safe.')
       setReportDetails('')
     } catch (requestError) {
       setReportStatus(requestError.message)

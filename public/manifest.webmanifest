@@ -1,6 +1,6 @@
 {
-  "name": "TikTik School Project",
-  "short_name": "TikTik",
+  "name": "RippleNest",
+  "short_name": "RippleNest",
   "description": "A social video application powered by C++ and MongoDB.",
   "start_url": "/",
   "display": "standalone",

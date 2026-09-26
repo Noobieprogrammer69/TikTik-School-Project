@@ -63,7 +63,7 @@ const App = () => {
       </div>
     )
   }
-  if (!config) return <div className="min-h-screen"><Loading text="Starting TikTik..." /></div>
+  if (!config) return <div className="min-h-screen"><Loading text="Starting RippleNest..." /></div>
 
   const app = <RoutedApp config={config} />
   return config.googleClientId ? (

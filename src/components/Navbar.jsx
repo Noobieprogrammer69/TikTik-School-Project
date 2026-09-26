@@ -7,7 +7,6 @@ import { IoMdAdd } from 'react-icons/io'
 import { IoNotificationsOutline } from 'react-icons/io5'
 import { Link, useNavigate } from 'react-router-dom'
 
-import logo from '../assets/logo.png'
 import useAuthStore from '../store/authStore'
 import Avatar from './Avatar'
 import ThemeToggle from './ThemeToggle'
@@ -55,9 +54,9 @@ const Navbar = ({ googleLoginEnabled }) => {
   return (
     <header className="app-navbar">
       <div className="flex w-full items-center justify-between gap-3">
-        <Link to="/" aria-label="TikTik home" className="brand-link">
-          <div className="brand-logo"><img src={logo} alt="" /></div>
-          <span className="hidden sm:block">TikTik</span>
+        <Link to="/" aria-label="RippleNest home" className="brand-link">
+          <div className="brand-logo"><img src="/app-icon.svg" alt="" /></div>
+          <span className="hidden sm:block">RippleNest</span>
         </Link>
 
         <div className="relative hidden flex-1 md:block md:max-w-md">

@@ -96,14 +96,14 @@ const Settings = () => {
     try {
       const data = await api.exportAccount()
       const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
-      const link = document.createElement('a'); link.href = url; link.download = 'tiktik-account-export.json'; link.click(); URL.revokeObjectURL(url)
+      const link = document.createElement('a'); link.href = url; link.download = 'ripplenest-account-export.json'; link.click(); URL.revokeObjectURL(url)
     } catch (error) { setMessage(error.message) } finally { setSaving('') }
   }
 
   const enableNotifications = async () => {
     if (!('Notification' in window)) { setMessage('This browser does not support desktop notifications.'); return }
     const permission = await window.Notification.requestPermission()
-    setMessage(permission === 'granted' ? 'Desktop notifications enabled while TikTik is open.' : 'Notification permission was not granted.')
+    setMessage(permission === 'granted' ? 'Desktop notifications enabled while RippleNest is open.' : 'Notification permission was not granted.')
   }
 
   const removeAccount = async () => {
@@ -150,7 +150,7 @@ const Settings = () => {
         <div className="settings-card"><h2><BsShieldCheck /> Security activity</h2>{securityEvents.length ? securityEvents.slice(0, 6).map((event, index) => <div className="compact-row" key={`${event.createdAt}-${index}`}><span>{event.type}<small>{event.detail || 'Account security event'}</small></span><small>{new Date(event.createdAt).toLocaleString()}</small></div>) : <p className="settings-empty">No recent security alerts.</p>}</div>
       </div>
 
-      <div className="settings-card"><h2>App & your data</h2><div className="settings-action-grid"><button className="secondary-button" onClick={enableNotifications}>Enable desktop notifications</button>{installPrompt && <button className="secondary-button" onClick={async () => { await installPrompt.prompt(); setInstallPrompt(null) }}>Install TikTik app</button>}<button className="secondary-button" onClick={exportData} disabled={saving === 'export'}><BsDownload /> {saving === 'export' ? 'Preparing...' : 'Download my data'}</button></div></div>
+      <div className="settings-card"><h2>App & your data</h2><div className="settings-action-grid"><button className="secondary-button" onClick={enableNotifications}>Enable desktop notifications</button>{installPrompt && <button className="secondary-button" onClick={async () => { await installPrompt.prompt(); setInstallPrompt(null) }}>Install RippleNest</button>}<button className="secondary-button" onClick={exportData} disabled={saving === 'export'}><BsDownload /> {saving === 'export' ? 'Preparing...' : 'Download my data'}</button></div></div>
 
       <div className="settings-card danger-zone"><h2><BsTrash /> Delete account</h2><p>This permanently deletes your profile, videos, messages, follows, and activity. This cannot be undone.</p><div className="delete-account-row"><input value={deleteText} onChange={(event) => setDeleteText(event.target.value)} placeholder="Type DELETE" aria-label="Type DELETE to confirm" /><button onClick={removeAccount} disabled={deleteText !== 'DELETE' || saving === 'delete'}>{saving === 'delete' ? 'Deleting...' : 'Delete permanently'}</button></div></div>
       {message && <p className="settings-status" role="status">{message}</p>}

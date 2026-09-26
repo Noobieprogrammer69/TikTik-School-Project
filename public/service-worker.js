@@ -1,5 +1,5 @@
 /* global self, caches, clients */
-const CACHE = 'tiktik-shell-v1'
+const CACHE = 'ripplenest-shell-v3'
 const SHELL = ['/', '/manifest.webmanifest', '/app-icon.svg']
 
 self.addEventListener('install', (event) => {

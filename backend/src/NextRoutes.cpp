@@ -227,7 +227,7 @@ void ApiServer::registerNextRoutes() {
                 const auto auth = authenticate(request, callback, false);
                 if (!auth) return;
                 auto response = nextJson(store_.exportAccount(auth->userId));
-                response->addHeader("Content-Disposition", "attachment; filename=tiktik-account-export.json");
+                response->addHeader("Content-Disposition", "attachment; filename=ripplenest-account-export.json");
                 callback(response);
             } catch (...) { handleException(callback); }
         }, {drogon::Get, drogon::Options});

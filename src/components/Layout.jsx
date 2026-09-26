@@ -42,9 +42,9 @@ const Layout = ({ googleLoginEnabled }) => {
         }
         setLiveNotice(labels[event.notificationType] || 'You have a new notification.')
         if (document.hidden && window.Notification?.permission === 'granted') {
-          navigator.serviceWorker?.ready.then((registration) => registration.showNotification('TikTik activity', {
+          navigator.serviceWorker?.ready.then((registration) => registration.showNotification('RippleNest activity', {
             body: labels[event.notificationType] || 'You have a new notification.',
-            icon: '/app-icon.svg', tag: `tiktik-${event.notificationType}`,
+            icon: '/app-icon.svg', tag: `ripplenest-${event.notificationType}`,
           })).catch(() => {})
         }
         window.clearTimeout(noticeTimer.current)
